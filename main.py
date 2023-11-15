@@ -14,7 +14,7 @@ def main():
     db.LoadDataFrame(data=df, tableName="VideoCategoriesRaw", boolReplace=True)
     for item in response["items"]:
         categoryId = item["id"]
-        print("Category ID: " + categoryId)
+        #print("Category ID: " + categoryId)
         videos = youtube.GetMostPopularVideos(categoryId=categoryId, numResults=25)
         json_string = json.dumps(videos, indent=2) 
         #print(json_string)
@@ -23,6 +23,11 @@ def main():
         df.insert(0, "insertDate", now)
         #print(df)
         db.LoadDataFrame(data=df, tableName="MostPopularVideosRaw", boolReplace=False)
+    
+    query = 'select distinct b."snippet.title" as "Category", a."snippet.channelId" as "ChannelId",  a."snippet.channelTitle" as "ChannelTitle" from public."MostPopularVideosRaw" a inner join public."VideoCategoriesRaw" b on (a."videoCategoryId" = b."id")'
+    records = db.GetData(query)
+    print("####################################################")
+    print(records)
 
 if __name__ == "__main__":
    main()

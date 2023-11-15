@@ -49,3 +49,18 @@ class YouTubeApi:
         )
         response = request.execute()
         return response
+    
+    def GetChannelData(self, channelId):
+        # Disable OAuthlib's HTTPS verification when running locally.
+        # *DO NOT* leave this option enabled in production.
+        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
+        youtube = googleapiclient.discovery.build(
+            self.api_service_name, self.api_version, credentials=self.credentials)
+
+        request = youtube.channels().list(
+        part="snippet,contentDetails,statistics",
+        id=channelId
+        )
+        response = request.execute()
+        return response

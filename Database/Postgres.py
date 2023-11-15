@@ -21,3 +21,14 @@ class Postgres:
         conn = psycopg2.connect(self.connection_string)
         conn.autocommit = True
         conn.close()
+    
+    def GetData(self, query):
+        conn = psycopg2.connect(self.connection_string)
+        cur = conn.cursor()
+        cur.execute(query)
+        records = cur.fetchall()
+        conn.commit()
+        conn.close()
+        return records
+
+        
