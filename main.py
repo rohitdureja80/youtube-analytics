@@ -15,9 +15,10 @@ def main():
         videos = youtube.GetMostPopularVideos(categoryId=categoryId, numResults=25)
         json_string = json.dumps(videos, indent=2) 
         #print(json_string)
+        df["videoCategoryId"] = categoryId
         df = json_normalize(videos["items"])
         #print(df)
-        db.LoadDataFrame(data=df, tableName="MostPopularVideos", boolReplace=False)
+        db.LoadDataFrame(data=df, tableName="MostPopularVideosRaw", boolReplace=False)
 
 if __name__ == "__main__":
    main()

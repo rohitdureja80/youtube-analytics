@@ -1,0 +1,8 @@
+{
+    "postgres": {
+        "host": "<hostname>",
+        "username": "<username>",
+        "password": "<password>",
+        "databaseName": "<database name>"
+    }
+}

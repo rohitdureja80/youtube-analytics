@@ -3,7 +3,9 @@ import json
 class ConfigParser:
     
     def __init__(self):
-        with open("./config.json") as jsonConfig:
+        environment = "LOCAL"
+        configFile = "./" + environment + "_config.json"
+        with open(configFile) as jsonConfig:
             self.config = json.load(jsonConfig)
     
     def DbConfigSettings(self):
