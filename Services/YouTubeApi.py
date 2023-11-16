@@ -1,5 +1,7 @@
 import os
-
+from loguru import logger
+import urllib.request 
+import urllib.error 
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
@@ -20,7 +22,7 @@ class YouTubeApi:
     def GetVideoCategories(self):
         # Disable OAuthlib's HTTPS verification when running locally.
         # *DO NOT* leave this option enabled in production.
-        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+        #os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
         youtube = googleapiclient.discovery.build(
             self.api_service_name, self.api_version, credentials=self.credentials)
@@ -33,27 +35,35 @@ class YouTubeApi:
         return response
 
     def GetMostPopularVideos(self, categoryId, numResults):
-        # Disable OAuthlib's HTTPS verification when running locally.
-        # *DO NOT* leave this option enabled in production.
-        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+        try:
+            # Disable OAuthlib's HTTPS verification when running locally.
+            # *DO NOT* leave this option enabled in production.
+            #os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-        youtube = googleapiclient.discovery.build(
-            self.api_service_name, self.api_version, credentials=self.credentials)
-        
-        request = youtube.videos().list(
-            part="snippet,statistics",
-            chart="mostPopular",
-            maxResults=numResults,
-            regionCode=self.regionCode,
-            videoCategoryId=categoryId
-        )
-        response = request.execute()
-        return response
+            youtube = googleapiclient.discovery.build(
+                self.api_service_name, self.api_version, credentials=self.credentials)
+            logger.debug("Calling YouTube API to get most popular videos...")
+            request = youtube.videos().list(
+                part="snippet,statistics",
+                chart="mostPopular",
+                maxResults=numResults,
+                regionCode=self.regionCode,
+                videoCategoryId=categoryId
+            )
+            response = request.execute()
+            logger.success("...results received")
+            return response
+        except googleapiclient.errors.HttpError as err:
+            logger.error(err)
+            raise Exception("error calling google api") from err
+        except:
+            logger.error("Error when executing api for category " + categoryId)
+            raise
     
     def GetChannelData(self, channelId):
         # Disable OAuthlib's HTTPS verification when running locally.
         # *DO NOT* leave this option enabled in production.
-        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+        #os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
         youtube = googleapiclient.discovery.build(
             self.api_service_name, self.api_version, credentials=self.credentials)
