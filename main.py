@@ -3,8 +3,10 @@ import Database.Postgres as database
 from pandas import json_normalize
 import json
 import datetime
+from loguru import logger
 
 def main():
+    logger.info("Starting process...")
     youtube = y.YouTubeApi()
     response = youtube.GetVideoCategories()
     now = datetime.datetime.now()
@@ -26,8 +28,9 @@ def main():
     
     query = 'select distinct b."snippet.title" as "Category", a."snippet.channelId" as "ChannelId",  a."snippet.channelTitle" as "ChannelTitle" from public."MostPopularVideosRaw" a inner join public."VideoCategoriesRaw" b on (a."videoCategoryId" = b."id")'
     records = db.GetData(query)
-    print("####################################################")
+    logger.trace(">> Printing records...")
     print(records)
+    logger.info("...Ending process")
 
 if __name__ == "__main__":
    main()
