@@ -41,7 +41,7 @@ class YouTubeApi:
             self.api_service_name, self.api_version, credentials=self.credentials)
         
         request = youtube.videos().list(
-            part="snippet,contentDetails,statistics",
+            part="snippet,statistics",
             chart="mostPopular",
             maxResults=numResults,
             regionCode=self.regionCode,
