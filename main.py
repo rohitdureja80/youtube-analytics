@@ -7,7 +7,7 @@ from loguru import logger
 import urllib.request 
 import urllib.error 
 
-def main():
+def LoadInitialData():
     try: 
         logger.info("Starting process...")
         youtube = y.YouTubeApi()
@@ -17,7 +17,7 @@ def main():
         df = json_normalize(response["items"])
         df.insert(0, "insertDate", now)
         db = database.Postgres()
-        db.LoadDataFrame(data=df, tableName="VideoCategoriesRaw", boolReplace=True)
+        db.LoadFromDataFrame(data=df, tableName="VideoCategoriesRaw", boolReplace=True)
         logger.info("Video categories saved to database")
         for item in response["items"]:
             try:
@@ -31,19 +31,28 @@ def main():
                 df.insert(0, 'videoCategoryId', categoryId)
                 df.insert(0, "insertDate", now)
                 #print(df)
-                db.LoadDataFrame(data=df, tableName="MostPopularVideosRaw", boolReplace=False)
+                db.LoadFromDataFrame(data=df, tableName="MostPopularVideosRaw", boolReplace=False)
                 logger.info("Most popular videos for video category " + categoryId + " saved to database")
             except Exception as e:
                 logger.debug(e)
                 continue
-        query = 'select distinct b."snippet.title" as "Category", a."snippet.channelId" as "ChannelId",  a."snippet.channelTitle" as "ChannelTitle" from public."MostPopularVideosRaw" a inner join public."VideoCategoriesRaw" b on (a."videoCategoryId" = b."id")'
-        logger.debug(query)
-        records = db.GetData(query)
-        print(type(records))
         logger.debug(">> Printing records...")
         logger.success("...Ending process")
     except Exception as err:
         logger.warning(err)
 
+def LoadChannelData():
+    query = 'select distinct b."snippet.title" as "Category", a."snippet.channelId" as "ChannelId",  a."snippet.channelTitle" as "ChannelTitle" from public."MostPopularVideosRaw" a inner join public."VideoCategoriesRaw" b on (a."videoCategoryId" = b."id") order by "Category", "ChannelId"'
+    logger.debug(query)
+    db = database.Postgres()
+    channels = db.GetData(query)
+    youtube = y.YouTubeApi()
+    for channel in channels:
+        channelId = channel[1]
+        response = youtube.GetChannelData(channelId)
+        print(response)
+        
+
 if __name__ == "__main__":
-   main()
+   #LoadInitialData()
+   LoadChannelData()

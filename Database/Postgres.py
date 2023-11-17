@@ -9,7 +9,7 @@ class Postgres:
         db_config = config.DbConfigSettings()
         self.connection_string = "postgresql://" + db_config["username"] + ":" + db_config["password"] + "@" + db_config["host"] + "/" + db_config["databaseName"]
     
-    def LoadDataFrame(self, data, tableName, boolReplace):
+    def LoadFromDataFrame(self, data, tableName, boolReplace):
         if (boolReplace):
             exists = 'replace'
         else:
